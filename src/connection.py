@@ -40,12 +40,13 @@ def main():
     type_of_document = "Determine quel type de document entre un document de restriction de rue ou de stationnement. Si ce n'est pas le cas, retourne 'None' and stop the process.\n"
 
     # Describe the CSV format and if one of the fields is missing, set it to "None"
-    CSV_format = "Fais un synthese de ce document avec une reponse très concis dans ce format de CSV avec ces champs precis: <date de l'arret>, <endroit de l'arret>, <raison de l'arret>, <Restrictions specifiques>, \
+    CSV_fields = "Adresse, date, période, disponibilité, raison (loi/événement), critères, Source,"
+    CSV_format = "Fais un synthese de ce document avec une reponse très concis dans ce format de CSV avec ces champs precis: " + CSV_fields + " \
     si un des champs est manquant, mettez-le a 'None'.\n"
 
     example = """
     This is an example of the response that should be generated:
-    "2013", "rue du Valibout, Plaisir", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement"\n
+    "Rue du Valibout, Plaisir", "2018 Janvier", "3 mois", "Limitée", "Loi", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Direction des services techniquesdirection des services techniques"\n
     """
 
     seed_text = "Voici le document:\n"
