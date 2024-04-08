@@ -32,10 +32,16 @@ def main():
     #     input=["Embed this sentence.", "As well as this one."],
     # )
 
+    directory = "../examples"
     file_content = read_text_file("../examples/example1.txt")
-
-    print(file_content)
-
+    
+    # Define the list of file extensions to check
+    extensions_list = ('.pdf', '.jpg', '.jpeg', '.png', '.txt', '.docx', '.doc')
+    
+    # Create a loop to read all the files in the directory and extract the text from each file
+    # for file in os.listdir(directory):
+        # if file.endswith(extensions_list):
+            
     # Determine if the document is a street or parking restriction document, if not, return "None"
     type_of_document = "Determine quel type de document entre un document de restriction de rue ou de stationnement. Si ce n'est pas le cas, retourne 'None' and stop the process.\n"
 
