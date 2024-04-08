@@ -4,6 +4,7 @@
 
 import os
 import csv
+from TxtExtraction import extract_text
 
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage # Not necessary for embeddings
@@ -30,20 +31,6 @@ seed_text = "Voici le document:\n"
 
 ## ----------------------- Functions ----------------------- ##
 
-
-# Function to read the content of a text file
-def read_text_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            return content
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-
 def main():
     api_key = os.environ["MISTRAL_API_KEY"]
     # model = "mistral-large-latest"
@@ -64,11 +51,16 @@ def main():
     for file in os.listdir(directory):
         if file.endswith(extensions_list):
 
-            file_content = read_text_file(os.path.join(directory, file))
+            print("Converting file to text: ", file)
+            file_content = extract_text(os.path.join(directory, file))
+            if file_content is None:
+                print(f"Error: Could not extract text from '{file}'")
+                continue
 
             payload = type_of_document + CSV_format + example + seed_text + file_content
 
-            print(payload)
+            # print(payload)
+            print (f"Processing file...")
 
             messages = [
                 ChatMessage(role="user", content=payload)
@@ -80,6 +72,7 @@ def main():
                 messages=messages,
             )
 
+            print("Generating CSV response...")
             line = chat_response.choices[0].message.content.split(',') # Split the response into a list of strings
             # Remove all of the double quotes from the strings
             line = [string.replace('"', '') for string in line]
@@ -87,7 +80,7 @@ def main():
             print(line)
 
             csv_array.append(line)
-        else
+        else:
             print(f"Error: File '{file}' is not a valid file type.")
 
     # Write the response to a CSV file
