@@ -27,8 +27,7 @@ This is an example of the response that should be generated:
 "Rue du Valibout - Plaisir", "2018 Janvier", "3 mois", "Limitée", "Loi", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Direction des services techniquesdirection des services techniques"\n
 """
 
-rules = "Règles pour la réponse: Don't use any comma (,) for anything else than separating the fields. Use the same format as the example above.\n"
-
+rules = "Règles pour la réponse : Supprimez chaque virgule (,) utilisée pour autre chose que pour séparer les champs. Joignez l'adresse complète du lieu avec - et non avec des espaces ou des virgules. Utilisez le même format que l'exemple ci-dessus.\n"
 seed_text = "Voici le document:\n"
 
 
