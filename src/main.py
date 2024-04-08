@@ -4,6 +4,7 @@
 
 import os
 import csv
+import requests
 from TxtExtraction import extract_text
 
 from mistralai.client import MistralClient
@@ -23,13 +24,48 @@ si un des champs est manquant, mettez-le a 'None'.\n"
 
 example = """
 This is an example of the response that should be generated:
-"Rue du Valibout, Plaisir", "2018 Janvier", "3 mois", "Limitée", "Loi", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Direction des services techniquesdirection des services techniques"\n
+"Rue du Valibout - Plaisir", "2018 Janvier", "3 mois", "Limitée", "Loi", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Direction des services techniquesdirection des services techniques"\n
 """
 
+rules = "Règles pour la réponse : Supprimez chaque virgule (,) utilisée pour autre chose que pour séparer les champs. Joignez l'adresse complète du lieu avec - et non avec des espaces ou des virgules. Utilisez le même format que l'exemple ci-dessus.\n"
 seed_text = "Voici le document:\n"
 
 
 ## ----------------------- Functions ----------------------- ##
+
+
+def geolocation(addresse):      
+
+    # Define the URL of the API endpoint
+    ADDOK_URL = 'http://api-adresse.data.gouv.fr/search/'
+
+    # Define the parameters for the API request, including the address and limit
+    params = {
+        'q': addresse,  # Address to search for
+        'limit': 5  # Limit the number of results to 5
+    }  
+    # Send a GET request to the API endpoint with the defined parameters
+    response = requests.get(ADDOK_URL, params=params)
+
+    # Parse the JSON response into a Python dictionary
+    j = response.json()
+
+    # Check if there are any features (results) in the response
+    if len(j.get('features')) > 0:
+        # Get the first result from the features list
+        first_result = j.get('features')[0]
+
+        # Extract the longitude and latitude coordinates from the geometry property
+        lon, lat = first_result.get('geometry').get('coordinates')
+
+        postcode = first_result.get('properties').get('postcode')
+
+        # Create a dictionary containing all information of the first result including lon and lat
+        first_result_all_infos = { **first_result.get('properties'), **{"lon": lon, "lat": lat, "postcode": postcode}}
+
+        return (f"Lon: {lon}, Lat: {lat}, Postcode: {postcode}")
+    else:
+        return "N/A"
 
 def main():
     api_key = os.environ["MISTRAL_API_KEY"]
@@ -57,7 +93,7 @@ def main():
                 print(f"Error: Could not extract text from '{file}'")
                 continue
 
-            payload = type_of_document + CSV_format + example + seed_text + file_content
+            payload = type_of_document + CSV_format + example + rules + seed_text + file_content
 
             # print(payload)
             print (f"Processing file...")
@@ -74,8 +110,14 @@ def main():
 
             print("Generating CSV response...")
             line = chat_response.choices[0].message.content.split(',') # Split the response into a list of strings
+            print("Line: ", line)
             # Remove all of the double quotes from the strings
             line = [string.replace('"', '') for string in line]
+
+            line.append(geolocation(line[0])) # Append latitude and longitude and zip code to the list
+
+            # Append the file name to the list
+            line.append(os.path.join(directory, file))
 
             print(line)
 
