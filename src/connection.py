@@ -3,6 +3,7 @@
 # https://docs.mistral.ai/platform/client/#embeddings
 
 import os
+import csv
 
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage # Not necessary for embeddings
@@ -23,7 +24,7 @@ def read_text_file(file_path):
 def main():
     api_key = os.environ["MISTRAL_API_KEY"]
     # model = "mistral-large-latest"
-    model = "mistral-tiny"
+    model = "mistral-tiny" # mistral 7B 
     client = MistralClient(api_key=api_key)
 
     # embeddings_batch_response = client.embeddings(
@@ -35,11 +36,23 @@ def main():
 
     print(file_content)
 
-    seed_text = "Ceci est un document administratif pour un arret permanent sur une rue. \
-        Fais un synthese de ce document dans ce CSV format: <date de l'arret>, <endroit de l'arret>, <raison de l'arret>, <Restrictions specifiques>.\
-        Document:"
+    # Determine if the document is a street or parking restriction document, if not, return "None"
+    type_of_document = "Determine quel type de document entre un document de restriction de rue ou de stationnement. Si ce n'est pas le cas, retourne 'None' and stop the process.\n"
 
-    payload = seed_text + file_content
+    # Describe the CSV format and if one of the fields is missing, set it to "None"
+    CSV_format = "Fais un synthese de ce document avec une reponse très concis dans ce format de CSV avec ces champs precis: <date de l'arret>, <endroit de l'arret>, <raison de l'arret>, <Restrictions specifiques>, \
+    si un des champs est manquant, mettez-le a 'None'.\n"
+
+    example = """
+    This is an example of the response that should be generated:
+    "2013", "rue du Valibout, Plaisir", "Sécurité, Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement", "Interdiction de stationnement pour poids lourds, sauf services publics ou déplacement"\n
+    """
+
+    seed_text = "Voici le document:\n"
+
+    payload = type_of_document + CSV_format + example + seed_text + file_content
+
+    print(payload)
 
     messages = [
         ChatMessage(role="user", content=payload)
