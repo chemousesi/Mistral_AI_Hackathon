@@ -15,6 +15,8 @@ def main():
         input=["Embed this sentence.", "As well as this one."],
     )
 
+    print(embeddings_batch_response)
+
 
 if __name__ == "__main__":
     main()
