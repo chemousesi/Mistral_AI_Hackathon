@@ -87,6 +87,8 @@ def main():
             print(line)
 
             csv_array.append(line)
+        else
+            print(f"Error: File '{file}' is not a valid file type.")
 
     # Write the response to a CSV file
     with open(CSV_FILE, mode='w', newline='') as file:
