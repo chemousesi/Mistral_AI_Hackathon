@@ -8,6 +8,7 @@ import csv
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage # Not necessary for embeddings
 
+CSV_FILE = "output.csv"
 
 def read_text_file(file_path):
     try:
@@ -26,13 +27,14 @@ def main():
     # model = "mistral-large-latest"
     model = "mistral-tiny" # mistral 7B 
     client = MistralClient(api_key=api_key)
+    csv_array = []
 
     # embeddings_batch_response = client.embeddings(
     #     model="mistral-embed",
     #     input=["Embed this sentence.", "As well as this one."],
     # )
 
-    file_content = read_text_file("../examples/example1.txt")
+    file_content = read_text_file("../examples/example3.txt")
 
     print(file_content)
 
@@ -65,7 +67,22 @@ def main():
         messages=messages,
     )
 
-    print(chat_response.choices[0].message.content)
+    line = chat_response.choices[0].message.content.split(',') # Split the response into a list of strings
+    # Remove all of the double quotes from the strings
+    line = [string.replace('"', '') for string in line]
+
+    print(line)
+
+    csv_array.append(line)
+
+    # Write the response to a CSV file
+    with open(CSV_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        for row in csv_array:
+            writer.writerow(row)
+    
+    print(f"Response written to '{CSV_FILE}'")
+
 
 
 if __name__ == "__main__":

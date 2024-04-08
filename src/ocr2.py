@@ -97,7 +97,8 @@ def table_converter(table):
 if __name__ == '__main__':
 
     # Find the PDF path
-    pdf_path = 'OFFER 3.pdf'
+    pdf_path = 'Vehicules-1966.pdf'
+    pdf_path = 'Voltaire-rue-17.161.pdf'
 
     # create a PDF file object
     pdfFileObj = open(pdf_path, 'rb')
